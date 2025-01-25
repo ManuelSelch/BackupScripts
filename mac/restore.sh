@@ -34,6 +34,7 @@ copy_zshrc() {
 }
 
 coopy_borgmatic() {
+    echo "copy borgmatic config"
     sudo mkdir -p "/etc/borgmatic" && sudo cp "$REPO_DIR/config.yaml" "/etc/borgmatic/config.yaml"
     sudo chown -R $USER:  /etc/borgmatic
 }
