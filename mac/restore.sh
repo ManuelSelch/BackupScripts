@@ -29,12 +29,12 @@ copy_zshrc() {
     cp ~/.zshrc ~/.zshrc.backup
 
     echo "Copying new .zshrc to the home directory..."
-    cp "$MAC_REPO_DIR/.zshrc" ~/
+    cp "$REPO_DIR/.zshrc" ~/
     echo ".zshrc copied successfully."
 }
 
 coopy_borgmatic() {
-    sudo mkdir -p "/etc/borgmatic" && sudo cp "$MAC_REPO_DIR/config.yaml" "/etc/borgmatic/config.yaml"
+    sudo mkdir -p "/etc/borgmatic" && sudo cp "$REPO_DIR/config.yaml" "/etc/borgmatic/config.yaml"
     sudo chown -R $USER:  /etc/borgmatic
 }
 
