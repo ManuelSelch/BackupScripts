@@ -2,7 +2,12 @@
 
 source ./$(dirname "$0")/.env
 
-# Function to check if Homebrew is installed
+pull_repo() {
+    echo "Pull Updates..."
+    cd "$MAC_REPO_DIR"
+    git pull
+}
+
 install_homebrew() {
     if ! command -v brew &> /dev/null
     then
@@ -13,15 +18,9 @@ install_homebrew() {
     fi
 }
 
-# Function to download Brewfile and run brew bundle
-pull() {
-    echo "Pull Updates..."
-    git pull
-}
-
 copy_brewfile() {
     echo "Running brew bundle to install software..."
-    brew bundle --file="$MAC_REPO_DIR/Brewfile"
+    brew bundle --file="$REPO_DIR/Brewfile"
 }
 
 # Function to copy .zshrc to the home directory
@@ -40,9 +39,8 @@ coopy_borgmatic() {
 }
 
 # Main Script Execution
-cd "$MAC_REPO_DIR"
+pull_repo
 install_homebrew
-pull
 
 copy_brewfile
 copy_zshrc
