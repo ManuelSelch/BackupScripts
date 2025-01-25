@@ -65,6 +65,12 @@ def add_database(config):
     cmd_dump = "docker exec "+container+" mysqldump -u "+user+" -p"+password+" "+database+" > "+dump_file
     cmd_cleanup = "rm " + dump_file
 
+
+    if 'before_backup' not in config.keys():
+        config['before_backup'] = []
+    if 'after_backup' not in config.keys():
+        config['after_backup'] = []
+
     config['before_backup'].append(cmd_dump)
     config['source_directories'].append(dump_file)
     config['after_backup'].append(cmd_cleanup)
