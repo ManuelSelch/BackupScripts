@@ -147,7 +147,8 @@ COMMANDS = {
     'add volume': add_volume,
     'add dir': add_dir,
     'add database': add_database,
-    'edit repo': edit_repository,
+    
+    'repo': edit_repository,
     
     'local': load_local_config,
     'remote': load_remote_config,
