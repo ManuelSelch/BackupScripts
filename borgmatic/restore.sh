@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./$(dirname "$0")/.env
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+source "$SCRIPT_DIR/.env"
 export BORG_PASSPHRASE=$BORG_PASSPHRASE
 
 cd /
