@@ -78,7 +78,7 @@ def save_config(config):
    
 
 def save_local_config(config):
-    with open(config_file, 'w') as f:
+    with open(config_file, 'w+') as f:
         yaml.dump(config, f, default_flow_style=False, sort_keys=False)
     print("Saved local")
 
