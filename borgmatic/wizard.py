@@ -17,6 +17,8 @@ default_config = {
         }
     ],
 
+    'mariadb_databases': [],
+
     'before_backup': [],
     'after_backup': [],
 
@@ -98,7 +100,7 @@ def add_dir(config):
     else:
         print("Invalid input. No volume added.")
 
-def add_volume(config):
+def add_docker_volume(config):
     volume = input("Docker volume name (e.g., /var/lib/docker/volumes/<VOLUME>): ")
     if volume:
         volume_path = "/var/lib/docker/volumes/" + volume
@@ -107,7 +109,7 @@ def add_volume(config):
     else:
         print("Invalid input. No volume added.")
 
-def add_database(config):
+def add_docker_database(config):
     container = input("container: ")
     user = input("user: ")
     password = input("password: ")
@@ -128,6 +130,23 @@ def add_database(config):
     config['source_directories'].append(dump_file)
     config['after_backup'].append(cmd_cleanup)
 
+
+def add_database(config):
+    if 'mariadb_databases' not in config.keys():
+        config['mariadb_databases'] = []
+
+    database = input("database: ")
+    user = input("user: ")
+    password = input("password: ")
+
+    config['mariadb_databases'].append({
+        'name': database,
+        'hostname': '127.0.0.1',
+        'port': 3306,
+        'username': user,
+        'password': password
+    })
+
 def edit_repository(config):
     repo = input("Repository: ")
     if repo:
@@ -144,7 +163,8 @@ def show_help(config):
 
 
 COMMANDS = {
-    'add volume': add_volume,
+    'add docker volume': add_docker_volume,
+    'add docker database': add_docker_database,
     'add dir': add_dir,
     'add database': add_database,
     
