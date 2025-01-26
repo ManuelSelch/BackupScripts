@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # installation
 sudo apt update
 sudo apt install borgbackup
