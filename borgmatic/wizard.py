@@ -1,9 +1,12 @@
 import yaml
 import os
 from dotenv import load_dotenv
+from paramiko import SSHClient, AutoAddPolicy, Ed25519Key
+from scp import SCPClient
 
 load_dotenv()
 config_file = os.getenv('BORG_CONFIG_FILE', 'config.yaml')
+scp: SCPClient = None
 
 default_config = {
     'source_directories': [],
@@ -20,7 +23,13 @@ default_config = {
     'keep_daily': 7,
     'keep_weekly': 4,
     'keep_monthly': 6,
-    'read_special': True
+
+    'archive_name_format': 'backup-{now}',
+    'relocated_repo_access_is_ok': True,
+    'files_cache': 'ctime,size',
+    'read_special': True,
+    'one_file_system': True,
+    'compression': 'lz4'
 }
 
 
@@ -32,10 +41,53 @@ def load_config():
     with open(config_file, 'r') as f:
         return yaml.safe_load(f)
 
+def load_local_config(config):
+    global scp
+    with open(config_file, 'r') as f:
+        localConfig = yaml.safe_load(f)
+        config.update(localConfig)
+    scp = None
+    print("Loaded local config")
+
+def load_remote_config(config):
+    global scp
+    ssh = SSHClient()
+    
+    ssh.set_missing_host_key_policy(AutoAddPolicy())
+    ssh.load_system_host_keys()
+    key_path = os.path.expanduser("~/.ssh/id_ed25519")
+    private_key = Ed25519Key.from_private_key_file(key_path)
+
+    host = input("host: ")
+    ssh.connect(host, username="manuel", pkey=private_key)
+
+    scp = SCPClient(ssh.get_transport())
+    scp.get(remote_path="/etc/borgmatic/config.yaml", local_path="config.yaml")
+    with open("config.yaml", 'r') as f:
+        remoteConfig = yaml.safe_load(f)
+        config.update(remoteConfig)
+
+    print("Loaded remote config")
+    pass
+
 def save_config(config):
+    if scp is None:
+        save_local_config(config)
+    else:
+        save_remote_config(config)
+   
+
+def save_local_config(config):
     with open(config_file, 'w') as f:
         yaml.dump(config, f, default_flow_style=False, sort_keys=False)
-    print(f"Config updated at {config_file}")
+    print("Saved local")
+
+def save_remote_config(config):
+    global scp
+    with open("config.yaml", 'w') as f:
+        yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+    scp.put("config.yaml", "/etc/borgmatic/config.yaml")
+    print("Saved remote")
 
 def add_dir(config):
     dir = input("dir: ")
@@ -96,6 +148,9 @@ COMMANDS = {
     'add database': add_database,
     'edit repo': edit_repository,
     
+    'local': load_local_config,
+    'remote': load_remote_config,
+
     'view': view_config,
     'save': save_config,
 
