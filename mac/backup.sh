@@ -1,19 +1,21 @@
 #!/bin/bash
 
-source ./$(dirname "$0")/.env
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+source "$SCRIPT_DIR/.env"
 
-# Backup Brewfile
+echo "Backup Mac Repo: $REPO_DIR"
+
+echo "Backup Brewfile"
 brew bundle dump --file="$REPO_DIR/Brewfile" --force
-cp "$DATA_DIR/Brewfile" "$REPO_DIR/Brewfile"
 
-# Backup .zshrc
+echo "Backup .zshrc"
 ZSHRC_FILE="$HOME/.zshrc"
 cp "$ZSHRC_FILE" "$REPO_DIR/.zshrc"
 
-# Backup Borgmatic
+echo "Backup Borgmatic Config"
 cp /etc/borgmatic/config.yaml "$REPO_DIR/config.yaml"
 
-# Commit
+echo "Commit"
 cd "$REPO_DIR"
 
 if [[ -n $(git status -s) ]]; then
